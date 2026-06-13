@@ -1,0 +1,84 @@
+THIRD-PARTY NOTICES — khipu-sda-core / szl_mosaic
+==================================================
+
+This SZL Holdings package (Apache-2.0) is a CLEAN-ROOM implementation. It adopts
+ALGORITHM IDEAS / METHODS from the following verified-permissive projects. Where a
+project's code is used as a runtime dependency (scikit-learn, scipy, sgp4, torch,
+matplotlib, numpy) the dependency's own license governs that code. Where only the
+METHOD/IDEA was adopted (PyOD, PyGOD, Merlion, TODS, tsod, GDN, GraGOD), the SZL
+code is original and the upstream license is reproduced/acknowledged below per
+attribution obligations.
+
+True Anomaly Inc.'s "Mosaic" platform is PROPRIETARY and is referenced ONLY as
+public-description INSPIRATION. No Mosaic code/assets are included.
+
+----------------------------------------------------------------------
+1) PyOD — yzhao062/pyod — BSD-2-Clause
+----------------------------------------------------------------------
+Copyright (c) PyOD developers. Redistribution and use in source and binary forms,
+with or without modification, are permitted provided that the following conditions
+are met: (1) Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer. (2) Redistributions
+in binary form must reproduce the above copyright notice, this list of conditions
+and the following disclaimer in the documentation and/or other materials provided
+with the distribution. THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY.
+
+----------------------------------------------------------------------
+2) PyGOD — pygod-team/pygod — BSD-2-Clause
+----------------------------------------------------------------------
+Copyright (c) PyGOD Team. BSD-2-Clause terms as above.
+
+----------------------------------------------------------------------
+3) Merlion — salesforce/Merlion — BSD-3-Clause
+----------------------------------------------------------------------
+Copyright (c) Salesforce.com, Inc. Redistribution and use in source and binary
+forms, with or without modification, are permitted provided that the BSD-3-Clause
+conditions are met, including: neither the name of the copyright holder nor the
+names of its contributors may be used to endorse or promote products derived from
+this software without specific prior written permission. PROVIDED "AS IS".
+
+----------------------------------------------------------------------
+4) TODS — datamllab/tods — Apache-2.0
+----------------------------------------------------------------------
+Copyright (c) DATA Lab. Licensed under the Apache License, Version 2.0. You may
+obtain a copy at http://www.apache.org/licenses/LICENSE-2.0. NOTICE: this product
+includes ideas adopted from TODS (Apache-2.0).
+
+----------------------------------------------------------------------
+5) tsod — DHI/tsod — MIT
+----------------------------------------------------------------------
+Copyright (c) DHI. Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation files, to deal in
+the Software without restriction, subject to inclusion of the copyright notice and
+this permission notice. THE SOFTWARE IS PROVIDED "AS IS".
+
+----------------------------------------------------------------------
+6) GDN — d-ailin/GDN — MIT
+----------------------------------------------------------------------
+Copyright (c) d-ailin. MIT terms as above. (Method: Graph Deviation Network,
+AAAI'21, arXiv:2106.06947 — cited, not vendored.)
+
+----------------------------------------------------------------------
+7) GraGOD — GraGODs/GraGOD — MIT
+----------------------------------------------------------------------
+Copyright (c) GraGOD authors. MIT terms as above.
+
+----------------------------------------------------------------------
+8) python-sgp4 — brandon-rhodes/python-sgp4 — MIT
+----------------------------------------------------------------------
+Copyright (c) Brandon Rhodes. MIT terms as above. Used as a runtime dependency
+for SGP4/SDP4 orbit propagation from TLE/OMM.
+
+----------------------------------------------------------------------
+9) scikit-learn (BSD-3), scipy (BSD-3), numpy (BSD-3), matplotlib (PSF/BSD-
+   compatible), PyTorch (BSD-3-style) — runtime dependencies under their own
+   licenses.
+----------------------------------------------------------------------
+
+======================================================================
+EXCLUDED — alibi-detect (SeldonIO/alibi-detect)
+======================================================================
+alibi-detect was relicensed to the Business Source License 1.1 on 2024-01-22
+(no production use without a commercial subscription). It is DELIBERATELY NOT
+USED, NOT imported, and CI blocks it. Reference:
+https://www.seldon.io/strengthening-our-commitment-to-open-core/

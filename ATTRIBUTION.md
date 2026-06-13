@@ -1,0 +1,61 @@
+# ATTRIBUTION — khipu-sda-core / szl_mosaic (clean-room)
+
+**SZL Holdings · Doctrine v11 · cite-never-plagiarize**
+
+## 1. Inspiration (capability only — NO code)
+
+This engine is SZL's sovereign, clean-room answer to **True Anomaly Inc.'s
+"Mosaic"** space-superiority platform. We were INSPIRED BY Mosaic's **publicly
+described capability** — fusing space- and ground-based sensors into a dynamic
+Common Operating Picture, accelerating the OODA loop, and supporting Space Domain
+Awareness, with the public four-function SDA decomposition
+**Detect/Track/ID → Characterize → ML Threat-Warning & Assessment → fuse/forecast**.
+
+- True Anomaly — Mosaic product page: https://www.trueanomaly.space/mosaic
+- SDA four-function decomposition (Eric Hilmer, True Anomaly, LinkedIn):
+  https://www.linkedin.com/posts/erichilmer_true-anomaly-lands-174m-contract-from-us-activity-7110684034724233216-371t
+
+**No proprietary Mosaic source code, assets, screenshots, or internal interfaces
+were seen, copied, decompiled, or referenced.** Mosaic itself is proprietary. We
+clean-room the *capability* from public descriptions only. This is INSPIRATION,
+not derivation.
+
+## 2. Methods adopted (clean-room — implemented from scratch, with license)
+
+We adopt only **verified-permissive** algorithm lineages. Each method below was
+re-implemented from public papers/descriptions; upstream code was not vendored.
+
+| Library | Role / idea adopted | License | URL |
+|---|---|---|---|
+| PyOD (`yzhao062/pyod`) | Isolation-Forest + classical outlier-detector bank pattern | **BSD-2-Clause** | https://github.com/yzhao062/pyod |
+| PyGOD (`pygod-team/pygod`) | Graph outlier-detection idea | **BSD-2-Clause** | https://github.com/pygod-team/pygod |
+| Merlion (`salesforce/Merlion`) | Autoencoder TSAD + detector ensembling pattern | **BSD-3-Clause** | https://github.com/salesforce/Merlion |
+| TODS (`datamllab/tods`) | Automated multivariate TSAD pipeline pattern | **Apache-2.0** | https://github.com/datamllab/tods |
+| tsod (`DHI/tsod`) | Lightweight robust statistical (z-score / MAD) detector | **MIT** | https://github.com/DHI/tsod |
+| GDN (`d-ailin/GDN`) | Graph Deviation Network — inter-sensor/track graph anomaly (explainable) | **MIT** | https://github.com/d-ailin/GDN |
+| GraGOD (`GraGODs/GraGOD`) | GNN time-series anomaly-detection framework idea | **MIT** | https://github.com/GraGODs/GraGOD |
+| python-sgp4 (`brandon-rhodes/python-sgp4`) | SGP4/SDP4 orbit propagation from TLE/OMM | **MIT** | https://github.com/brandon-rhodes/python-sgp4 |
+| scikit-learn | IsolationForest, StandardScaler (permissive dependency) | **BSD-3-Clause** | https://scikit-learn.org |
+| PyTorch (optional) | tiny autoencoder (permissive dependency) | **BSD-3-style** | https://pytorch.org |
+
+### Science cited (papers — cite, do NOT vendor)
+- GDN, AAAI'21 — *Graph Neural Network-Based Anomaly Detection in Multivariate
+  Time Series* — arXiv:2106.06947.
+- Graph time-series anomaly-detection surveys — arXiv:2302.00058, arXiv:2307.03759.
+- PAC-Bayes bounds — McAllester (1999); Catoni (2007). Used for the honest
+  confidence band (formula only; not vendored).
+- Conformal prediction — Vovk et al.; Lei et al. (split-conformal band).
+
+## 3. EXCLUDED (license hard-reject)
+
+- **alibi-detect (`SeldonIO/alibi-detect`)** — relicensed to **Business Source
+  License 1.1** on **2024-01-22** (no production use without a subscription).
+  **DELIBERATELY NOT USED. Not imported. CI blocks it.**
+  Source: https://www.seldon.io/strengthening-our-commitment-to-open-core/
+
+## 4. House license & posture
+
+This package ships **Apache-2.0** (SZL house license), with `THIRD_PARTY_NOTICES`
+reproducing each upstream license. Doctrine v11 applies throughout: Λ = Conjecture 1
+(advisory, never proven trust); sovereign own-metal, 0 CDN; honest UNSIGNED
+receipts; validation numbers are real on synthetic data; every $/credit = ESTIMATE.

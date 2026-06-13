@@ -1,0 +1,10 @@
+khipu-sda-core / szl_mosaic
+Copyright (c) SZL Holdings.
+Licensed under the Apache License, Version 2.0.
+
+This product includes clean-room implementations inspired by the publicly
+described capability of True Anomaly Inc.'s "Mosaic" platform (inspiration only;
+no proprietary code). It adopts algorithm methods from PyOD (BSD-2), PyGOD
+(BSD-2), Merlion (BSD-3), TODS (Apache-2.0), tsod (MIT), GDN (MIT), GraGOD (MIT),
+and python-sgp4 (MIT). See ATTRIBUTION.md and THIRD_PARTY_NOTICES.
+alibi-detect (BSL-1.1) is excluded.

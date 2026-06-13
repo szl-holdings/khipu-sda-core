@@ -1,0 +1,27 @@
+name: CI
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Install
+        run: pip install -r requirements.txt pytest
+      - name: Run tests
+        run: pytest -q tests/
+      - name: Doctrine — forbid BSL alibi-detect (license hygiene)
+        run: |
+          if grep -rIE "alibi[-_]detect" --include="*.py" --include="*.txt" . ; then
+            echo "::error::alibi-detect is BSL-1.1 — forbidden. Use permissive lineage only."; exit 1
+          fi
+          echo "OK: no BSL alibi-detect dependency"
+      - name: Doctrine — no fabricated signatures
+        run: |
+          if grep -rIE "signature\s*[:=]\s*['\"][A-Za-z0-9+/]{20,}" --include="*.py" . ; then
+            echo "::error::possible fabricated signature literal"; exit 1
+          fi
+          echo "OK: no fabricated signature literals"
