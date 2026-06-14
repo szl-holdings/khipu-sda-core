@@ -5,14 +5,18 @@
 SZL's sovereign answer to True Anomaly's **Mosaic** ("the operating system for
 space superiority"). This is the **clean-room anomaly/SDA CORE organ**: a
 multivariate + graph anomaly-detection ensemble, multi-sensor track fusion into a
-Common Operating Picture (COP), and an honest orbital-SDA roadmap seed — each
-verdict emitting a structured, **honestly UNSIGNED** provenance receipt with an
-**Λ-gated, bounded-confidence** advisory.
+Common Operating Picture (COP), a **real orbital conjunction screen** (sgp4
+time-of-closest-approach + miss distance over a small TLE catalog, honestly
+labeled SCREENING-GRADE / roadmap-toward-operational), and **multi-witness
+verified detection** (a Khipu 3-of-4 quorum, Conjecture 2) — each verdict emitting
+a structured, **honestly UNSIGNED** provenance receipt with an **Λ-gated,
+bounded-confidence** advisory.
 
 > **One honest sentence:** today killinchu does **counter-UAS / drone / vessel**
 > track→classify→evaluate→signed-receipt at the air/maritime edge; the **orbital-
-> SDA / Threat-Warning** extension is **roadmap** — this engine builds the
-> capability and labels the orbital surface as roadmap, never claiming SZL flies.
+> SDA / Threat-Warning** extension is **roadmap-toward-operational** — the orbital
+> screen now computes **real** sgp4 closest-approach geometry but is honestly
+> labeled **SCREENING-GRADE, NOT \(P_c\)/covariance-grade** and never claims SZL flies.
 
 ---
 
@@ -41,11 +45,12 @@ scikit-learn (BSD-3), matplotlib, optional torch (BSD-3-style).
 |---|---|---|
 | `szl_mosaic_core.py` | Multivariate anomaly ENSEMBLE (Isolation-Forest + autoencoder + robust z-score) + **GraphDeviationDetector** (track-relational) + provenance receipt + Λ-gate + conformal CI | PyOD, Merlion/TODS, tsod, GDN/PyGOD |
 | `szl_track_fusion.py` | Multi-sensor track fusion: global-nearest-neighbour association + tiny constant-velocity **Kalman** update → fused **COP** track list | textbook MTT (numpy) |
-| `szl_sda_orbit.py` | **SDA roadmap seed**: `python-sgp4` TLE propagation + advisory conjunction/orbital-anomaly flag | python-sgp4 (MIT) |
+| `szl_sda_orbit.py` | **SDA orbital screen (roadmap-toward-operational)**: `python-sgp4` TLE propagation + **REAL pairwise conjunction screen** (time-of-closest-approach + miss distance over a small catalog) + conformal band + advisory orbital-anomaly flag | python-sgp4 (MIT) |
+| `szl_witness.py` | **Multi-witness verified detection**: N independent witness re-scorers + **Khipu 3-of-4 quorum** + quorum receipt (Conjecture 2, proposed) | textbook BFT quorum (numpy) |
 | `szl_confidence.py` | Honest **bounded confidence**: split-conformal band + **PAC-Bayes (Catoni/McAllester)** bound — labeled `ESTIMATE` | conformal; PAC-Bayes (cited) |
 | `szl_sda_envelope.py` | The FROZEN **§3.0 interface contract**: `evaluate(track) -> envelope` with in-toto **Statement v1** receipt | spec §3.0 |
-| `szl_mosaic_validate.py` | Synthetic multi-track generator + injected anomalies + **honest precision/recall** + matplotlib figure | — |
-| `tests/` | `test_no_mock.py` (no placeholder logic; alibi-detect absent) + `test_receipt_roundtrip.py` | — |
+| `szl_mosaic_validate.py` | Synthetic multi-track generator + injected anomalies + **honest precision/recall** + **orbital conjunction screen** + **witness quorum** + 6-panel matplotlib figure | — |
+| `tests/` | `test_no_mock.py` (no placeholder logic; alibi-detect absent) + `test_receipt_roundtrip.py` + `test_orbit_screen.py` (real sgp4 conjunction) + `test_witness_quorum.py` (real 3-of-4 quorum) | — |
 
 ---
 
@@ -108,6 +113,56 @@ Both are reported as `ESTIMATE`. They are bounds/intervals — **never a certain
 Verdicts are **advisories** under human-on-the-loop — **never "proven trust"**,
 never folded into locked-proven = 8.
 
+### 9. Orbital conjunction screen (REAL closest-approach geometry)
+Propagate each catalog object with SGP4 over a screening window
+\(\{t_0+k\,\Delta t\}_{k=0}^{N-1}\) to TEME positions \(\mathbf r_a(t),\mathbf r_b(t)\).
+For each pair, the discrete relative range is \(d_k=\lVert\mathbf r_a(t_k)-\mathbf r_b(t_k)\rVert\);
+the time-of-closest-approach (TCA) is refined to sub-step resolution by a local
+3-point parabolic vertex around the discrete minimum \(k^\star\):
+\[
+\delta=\tfrac12\,\frac{d_{k^\star-1}-d_{k^\star+1}}{d_{k^\star-1}-2d_{k^\star}+d_{k^\star+1}},\qquad
+d_{\min}=d_{k^\star}-\tfrac14\,(d_{k^\star-1}-d_{k^\star+1})\,\delta.
+\]
+A pair is flagged when \(d_{\min}\le\) `threshold_km`. The encounter (relative)
+speed at TCA is \(\lVert\mathbf v_a-\mathbf v_b\rVert\). This is **standard,
+public-domain astrodynamics** (relative-range minimisation + parabolic
+refinement) — no proprietary CA internals.
+
+> **HONEST LIMIT — SCREENING-GRADE, NOT \(P_c\)/COVARIANCE-GRADE.** SGP4 propagates
+> **mean elements with no per-object covariance**, so the screen emits a
+> *deterministic miss distance*, **never a probability of collision** \(P_c\). TLE
+> epoch staleness and drag/SRP mismodelling widen the true uncertainty well beyond
+> the reported point miss (km-level along-track error budget). A real CA product
+> (e.g. CARA/CSpOC) fuses covariance, a high-fidelity numerical propagator, and
+> integrates \(P_c\) over the encounter — **this module does triage only**, and is
+> ADVISORY (Λ = Conjecture 1). The miss is wrapped in the §7 conformal band as an
+> `ESTIMATE`, **not** a calibrated risk. The demo catalog uses **real public sample
+> TLEs plus one explicitly-DERIVED co-orbiting companion** (a transparent
+> mean-anomaly offset of a real TLE, labeled SAMPLE/DERIVED) so the screen finds a
+> real, sub-threshold close approach to exercise — we **never fabricate orbital
+> ground truth**.
+
+### 10. Multi-witness verified detection (Khipu 3-of-4 quorum)
+Given a detection with base score \(S\) and evidence vector \(\mathbf e\), each of
+\(M\) **independent witness nodes** \(w\) re-scores it under its own seed: it
+bootstrap-resamples the evidence (\(\tilde{\mathbf e}_w=\mathbf e[\mathrm{idx}_w]+\eta_w\),
+\(\eta_w\sim\mathcal N(0,\sigma^2)\)) and reports
+\(s_w=\tfrac12 S+\tfrac12\tanh(\overline{|\tilde{\mathbf e}_w|})\in[0,1]\), then maps
+\(s_w\) to a Λ band. Let \(c\) be the count of witnesses in the modal band; the
+detection is **witnessed** iff \(c\ge Q\) with the Khipu quorum \(Q\text{-of-}M=3\text{-of-}4\)
+(super-majority, tolerates one dissenting/faulty witness). The quorum receipt
+records which witnesses agreed and the agreed score band \([\min_w s_w,\max_w s_w]\).
+
+> **HONEST LIMIT — Khipu BFT = Conjecture 2 (PROPOSED, NOT PROVEN).** This is the
+> **engineering mechanism** (an \(N\)-of-\(M\) agreement gate), **not a proven-safe
+> consensus**: no Byzantine safety/liveness proof, no partial-synchrony bound, no
+> equivocation/sybil model exercised. The witnesses are **simulated independent
+> re-scorers in one process** — no network, no real replication, no adversary. A
+> *witnessed* verdict is a **stronger ADVISORY** (more independent scorers
+> concurred), **never proven trust** and **never folded into locked-proven = 8**.
+> The receipt digest is a SHA-256 provenance handle, **not** a signature — no
+> signature is ever fabricated. Λ stays Conjecture 1 (advisory).
+
 ---
 
 ## §3.0 SDA verdict envelope (the frozen interface contract)
@@ -166,8 +221,35 @@ the calibration (normal) distribution (not tuned to the test anomalies):
 high-precision / low-recall (it only fires on velocity-space maneuvers and
 correctly MISSES the RCS spike, which has no kinematic signature). False positives
 come from genuine normal heading-drift noise — not hidden. These are small-model,
-honest numbers, not inflated. See `mosaic_validation.png` for the figure (tracks +
-flagged anomalies + fused COP + score curves).
+honest numbers, not inflated.
+
+### Orbital conjunction screen (REAL sgp4 numbers)
+The same harness now runs the real pairwise conjunction screen over a 4-object
+demo catalog (real public sample TLEs + one explicitly-DERIVED co-orbiting
+companion) on a 90-minute window (180 steps × 0.5 min):
+
+- **catalog objects = 4; pairwise conjunctions < 5 km = 1**
+- **ISS (ZARYA) 25544 × ISS-COMPANION (DERIVED):** miss **2.368 km** @ TCA
+  **+2302 s**, encounter rel-speed **0.0027 km/s**, verdict **advisory**, conformal
+  `ESTIMATE` band **[2.37, 9040] km** (the wide upper bound honestly reflects the
+  no-covariance screening posture — it is not a \(P_c\)). The three unrelated
+  public pairs stay at ~10³–10⁴ km and are NOT flagged. **SCREENING-GRADE, NOT
+  \(P_c\)-grade** (see math §9).
+
+### Multi-witness verified detection (REAL 3-of-4 quorum)
+The harness witnesses the engine's strongest behavioural detection and a
+clearly-normal cell through 4 independent re-scorers:
+
+- **STRONG TRK-1@t40:** base 1.000 (deny) → **witnessed**, agreed band **deny 4/4**,
+  agreed score-band **[0.942, 0.991]**.
+- **NORMAL TRK-0@t5:** base 0.188 (allow) → **witnessed**, agreed band **allow 3/4**.
+- On bimodal/boundary evidence the quorum genuinely **FAILS** (a real 2–2 split is
+  exercised in `tests/test_witness_quorum.py`) — the gate is real, not always-True.
+  **Khipu BFT = Conjecture 2 (proposed, not proven)** — a witnessed verdict is a
+  stronger ADVISORY only (see math §10).
+
+See `mosaic_validation.png` for the 6-panel figure (tracks + flagged anomalies +
+fused COP + score curves + **orbital conjunction screen** + **witness quorum**).
 
 ---
 
@@ -177,7 +259,8 @@ flagged anomalies + fused COP + score curves).
 pip install -r requirements.txt
 python3 szl_mosaic_core.py        # smoke test the ensemble + receipt
 python3 szl_track_fusion.py       # smoke test fusion -> COP
-python3 szl_sda_orbit.py          # sgp4 propagation + conjunction advisory
+python3 szl_sda_orbit.py          # REAL pairwise conjunction screen (sgp4 TCA + miss)
+python3 szl_witness.py            # multi-witness 3-of-4 quorum (Conjecture 2)
 python3 szl_sda_envelope.py       # emit a §3.0 envelope (air + orbital)
 python3 szl_mosaic_validate.py    # full validation -> mosaic_validation.png
 python3 -m pytest tests/ -q       # honesty + receipt round-trip tests
@@ -189,7 +272,11 @@ python3 -m pytest tests/ -q       # honesty + receipt round-trip tests
 
 Λ = **Conjecture 1** (advisory, never proven trust) · locked-proven = **8**
 `{F1,F4,F7,F11,F12,F18,F19,F22}` (this engine is engineering capability, NOT in
-the locked count) · Khipu BFT = **Conjecture 2** (open) · SLSA **L1 honest /
+the locked count) · Khipu BFT = **Conjecture 2** (proposed, NOT proven — the
+`szl_witness.py` 3-of-4 quorum is the engineering mechanism, not a proven-safe
+consensus; a 'witnessed' verdict is a stronger ADVISORY only) · orbital screen =
+**SCREENING-GRADE roadmap**, honestly NOT operational \(P_c\)/covariance-grade ·
+SLSA **L1 honest /
 L2 build-attested / L3 roadmap** · **sovereign own-metal, 0 CDN** · **NO
 free-energy** · joules MEASURED only · every $/credit = **ESTIMATE** ·
 **cite-never-plagiarize** · NEVER fabricate numbers (validation is real on
