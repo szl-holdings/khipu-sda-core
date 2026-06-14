@@ -11,7 +11,8 @@ import re
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOURCES = ["szl_mosaic_core.py", "szl_track_fusion.py", "szl_sda_orbit.py",
-           "szl_confidence.py", "szl_sda_envelope.py", "szl_mosaic_validate.py"]
+           "szl_confidence.py", "szl_sda_envelope.py", "szl_mosaic_validate.py",
+           "szl_witness.py"]
 
 # tokens that indicate placeholder (non-real) logic
 BANNED = re.compile(r"\b(mock|fake|stub|dummy)\b", re.IGNORECASE)
