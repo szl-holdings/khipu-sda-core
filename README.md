@@ -268,6 +268,41 @@ python3 -m pytest tests/ -q       # honesty + receipt round-trip tests
 
 ---
 
+## Operations (ownership · health · rollback)
+
+**Ownership.** SZL Holdings · Dev 1 (anomaly/SDA CORE organ). This is an importable
+library + CLI smoke/validation harness — it is *not* a long-running network service
+(sovereign, own-metal, 0 CDN, no listening port), so there is no `/healthz` endpoint
+to expose. Its "health check" is the test suite + per-module smoke run.
+
+**Health / readiness check.** Treat a green run of the following as readiness:
+
+```bash
+python3 -m pytest tests/ -q      # 20 tests: honesty gate + receipt/orbit/quorum
+python3 szl_sda_orbit.py         # must print: catalog objects: 4; ... advisories (<5 km): 1
+```
+
+CI (`.github/workflows/ci.yml`) gates every push/PR on: the full test suite, a
+license-hygiene check (BSL `alibi-detect` forbidden as a dependency/import), and a
+no-fabricated-signature check. Main is never merged red.
+
+**Rollback (one-step, tested).** Releases are plain git refs — there is no stateful
+migration to unwind, so rollback is a single revert/checkout:
+
+```bash
+# revert the most recent merge to main (keeps history; preferred)
+git revert -m 1 <merge_commit_sha>
+
+# or pin a known-good tagged release for a redeploy
+git checkout <last_good_tag>     # e.g. the commit before the regression
+```
+
+Verify the rollback the same way as readiness above (pytest + the orbit smoke line).
+Because the engine holds no persistent state and writes only `mosaic_validation.png`
+(gitignored), reverting code is a complete rollback.
+
+---
+
 ## Doctrine v11 (binding)
 
 Λ = **Conjecture 1** (advisory, never proven trust) · locked-proven = **8**
