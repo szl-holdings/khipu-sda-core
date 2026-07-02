@@ -25,8 +25,10 @@ HONESTY (Doctrine v11):
   - confidence.label = "ESTIMATE" always.
   - sovereign = true (own-metal, no network in this module).
 
-Attribution: the receipt schema mirrors szl_mechanics/receipt.py (in-toto
-Statement v1). Engine lineage libs: PyOD(BSD-2), Merlion(BSD-3), TODS(Apache-2),
+Attribution: the in-toto Statement v1 receipt shape is DELEGATED to the shared
+szl_receipt.attest library (single source of truth; szl_mechanics/szl_pinn are
+sibling emitters that should converge there too). Engine lineage libs:
+PyOD(BSD-2), Merlion(BSD-3), TODS(Apache-2),
 tsod(MIT), GDN/GraGOD(MIT), PyGOD(BSD-2), python-sgp4(MIT). alibi-detect(BSL-1.1)
 EXCLUDED. True Anomaly Mosaic = inspiration only (public descriptions); no code.
 """
@@ -54,29 +56,63 @@ def _sha256_hex(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
-def make_intoto_receipt(track_id: str, subject_digest: str,
-                        model_hash: str, seed: int,
-                        anomaly_score: float) -> dict:
-    """Build the in-toto Statement v1 receipt (same schema as szl_mechanics).
+# The in-toto Statement v1 shape emitted here is DELEGATED to the shared
+# szl_receipt.attest library — the single source of truth for this shape across
+# the SZL substrate (gim, szl-energy-attest, szl-router already build on it).
+# We do NOT re-implement the shape; szl_mechanics/szl_pinn are sibling emitters
+# that should also converge here. See CONSOLIDATION notes / szl-receipt v0.2.0.
+PREDICATE_TYPE = "https://szlholdings.com/attestations/sda-anomaly/v1"
 
-    Honest: predicate.verified = False (UNSIGNED). predicate.sovereign = True.
+
+def _build_statement_local(track_id: str, subject_digest: str,
+                           predicate: dict) -> dict:
+    """Byte-identical fallback for szl_receipt.attest.build_statement.
+
+    Used ONLY when the shared szl-receipt library is not installed. The import
+    is lazy so this package stays zero-hard-dependency and NON-BREAKING; the
+    fallback is a thin mirror of the canonical shape, never an independent copy.
     """
     return {
         "_type": "https://in-toto.io/Statement/v1",
-        "predicateType": "https://szlholdings.com/attestations/sda-anomaly/v1",
         "subject": [{"name": track_id, "digest": {"sha256": subject_digest}}],
-        "predicate": {
-            "engine": "khipu-sda-core",
-            "model_hash": model_hash,
-            "seed": seed,
-            "anomaly_score": float(anomaly_score),
-            "lib_lineage": LIB_LINEAGE,
-            "inspiration": "True Anomaly Mosaic (public descriptions only; no code)",
-            "doctrine": "v11",
-            "verified": False,        # UNSIGNED until a real DSSE signs downstream
-            "sovereign": True,        # own-metal, 0 CDN
-        },
+        "predicateType": PREDICATE_TYPE,
+        "predicate": predicate,
     }
+
+
+def make_intoto_receipt(track_id: str, subject_digest: str,
+                        model_hash: str, seed: int,
+                        anomaly_score: float) -> dict:
+    """Build the in-toto Statement v1 receipt.
+
+    The domain-specific predicate is assembled here; the in-toto Statement v1
+    ENVELOPE shape is DELEGATED to szl_receipt.attest.build_statement (the shared
+    single source of truth) via a lazy import, with a byte-identical local
+    fallback if szl-receipt is absent. Output is unchanged either way.
+
+    Honest: predicate.verified = False (UNSIGNED). predicate.sovereign = True.
+    """
+    predicate = {
+        "engine": "khipu-sda-core",
+        "model_hash": model_hash,
+        "seed": seed,
+        "anomaly_score": float(anomaly_score),
+        "lib_lineage": LIB_LINEAGE,
+        "inspiration": "True Anomaly Mosaic (public descriptions only; no code)",
+        "doctrine": "v11",
+        "verified": False,        # UNSIGNED until a real DSSE signs downstream
+        "sovereign": True,        # own-metal, 0 CDN
+    }
+    try:
+        from szl_receipt.attest import build_statement as _shared_build_statement
+    except Exception:
+        return _build_statement_local(track_id, subject_digest, predicate)
+    return _shared_build_statement(
+        subject_name=track_id,
+        subject_digest=subject_digest,
+        predicate=predicate,
+        predicate_type=PREDICATE_TYPE,
+    )
 
 
 def lambda_verdict(score: float, allow_thr: float = 0.35,

@@ -9,6 +9,13 @@ sgp4>=2.20             # python-sgp4 (brandon-rhodes); MIT — orbit propagation
 torch>=2.0             # OPTIONAL tiny autoencoder; BSD-3-style. Falls back to a
                        # pure-numpy PCA autoencoder if torch is absent.
 
+# Shared receipt/attestation contract — the SINGLE SOURCE OF TRUTH for the
+# in-toto Statement v1 shape this package emits (szl_sda_envelope.make_intoto_receipt
+# delegates to szl_receipt.attest.build_statement). Public, Apache-2.0, pinned by
+# tag. The import is lazy so absence degrades to an identical local fallback
+# (honest, non-breaking).
+szl-receipt @ git+https://github.com/szl-holdings/szl-receipt.git@v0.2.0
+
 # --- DEV/TEST ---
 pytest>=7.0
 
