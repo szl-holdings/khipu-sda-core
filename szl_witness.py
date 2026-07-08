@@ -101,6 +101,8 @@ class QuorumReceipt:
     conjecture: str = "Conjecture 2 (proposed, not proven)"
     note: str = CONJECTURE_2_NOTE
     _walltime_s: Optional[float] = None
+    n_opinions_submitted: Optional[int] = None   # set for external opinions;
+    #   > distinct_witnesses ⇒ duplicate witness_ids were deduped (input hygiene)
 
     def to_dict(self) -> dict:
         return {
@@ -111,6 +113,8 @@ class QuorumReceipt:
             "agreed_band": self.agreed_band,
             "agree_count": self.agree_count,
             "witnessed": self.witnessed,
+            "distinct_witnesses": self.n_witnesses,
+            "n_opinions_submitted": self.n_opinions_submitted,
             "agreed_score_band": {
                 "lo": round(self.agreed_score_lo, 6),
                 "hi": round(self.agreed_score_hi, 6),
@@ -155,12 +159,46 @@ def default_rescorer(evidence: np.ndarray, seed: int,
     return float(np.clip(score, 0.0, 1.0))
 
 
+def dedup_witness_opinions(opinions: list) -> list:
+    """INPUT HYGIENE: keep at most ONE opinion per witness_id (first-seen wins).
+
+    A quorum tally must count DISTINCT witnesses. Without this, a single node
+    that submits its opinion K times (echo / duplicate stuffing) would be counted
+    K times and could single-handedly manufacture a quorum. Deduping by
+    witness_id closes that stuffing vector.
+
+    HONEST SCOPE (Doctrine v11): this is INPUT HYGIENE only. It is NOT sybil
+    resistance (a node forging K *distinct* spoofed identities is not stopped
+    here) and NOT a Byzantine-safety proof. Khipu BFT stays Conjecture 2.
+    """
+    seen: set = set()
+    out: list = []
+    for op in opinions:
+        if op.witness_id in seen:
+            continue
+        seen.add(op.witness_id)
+        out.append(op)
+    return out
+
+
+def naive_stuffed_agree_count(opinions: list, agreed_band: str) -> int:
+    """DEMONSTRATOR of the vulnerability `dedup_witness_opinions` closes.
+
+    A naive tally counts EVERY submitted opinion in the band with no dedup, so a
+    single node echoing its opinion K times inflates the count K-fold. Exposed
+    only to make the adversarial test explicit — the shipped `witness_quorum`
+    path always dedups external opinions first.
+    """
+    return sum(1 for op in opinions if op.band == agreed_band)
+
+
 def witness_quorum(subject: str, base_score: float, evidence: np.ndarray,
                    n_witnesses: int = DEFAULT_N_WITNESSES,
                    quorum: int = DEFAULT_QUORUM,
                    allow_thr: float = 0.35, deny_thr: float = 0.65,
                    rescorer: Optional[Callable] = None,
-                   base_seed: int = 1000) -> QuorumReceipt:
+                   base_seed: int = 1000,
+                   external_opinions: Optional[list] = None) -> QuorumReceipt:
     """Run an N-of-M multi-witness quorum over one detection.
 
     Each of `n_witnesses` independent witnesses re-scores `evidence` with its own
@@ -174,15 +212,38 @@ def witness_quorum(subject: str, base_score: float, evidence: np.ndarray,
     rescorer = rescorer or default_rescorer
     base_band = verdict_band(base_score, allow_thr, deny_thr)
 
-    witnesses = []
-    for w in range(n_witnesses):
-        seed = base_seed + w
-        sc = rescorer(evidence, seed, base_score)
-        band = verdict_band(sc, allow_thr, deny_thr)
-        witnesses.append(WitnessOpinion(witness_id=f"witness-{w}", seed=seed,
-                                        score=sc, band=band))
+    n_opinions_submitted: Optional[int] = None
+    if external_opinions is not None:
+        # Externally-supplied witnesses (e.g. real independent nodes). Apply
+        # INPUT HYGIENE: count each witness_id at most once so a single node
+        # cannot stuff the tally by echoing its opinion K times. (Honest scope:
+        # input hygiene only — NOT sybil resistance, NOT a Byzantine-safety
+        # proof; Khipu BFT stays Conjecture 2.)
+        submitted = list(external_opinions)
+        n_opinions_submitted = len(submitted)
+        witnesses = dedup_witness_opinions(submitted)
+        n_witnesses = len(witnesses)
+    else:
+        witnesses = []
+        for w in range(n_witnesses):
+            seed = base_seed + w
+            sc = rescorer(evidence, seed, base_score)
+            band = verdict_band(sc, allow_thr, deny_thr)
+            witnesses.append(WitnessOpinion(witness_id=f"witness-{w}", seed=seed,
+                                            score=sc, band=band))
 
-    # tally bands → modal band
+    # honest edge case: no witnesses ⇒ nothing is witnessed
+    if not witnesses:
+        empty = QuorumReceipt(
+            subject=subject, base_score=float(base_score), base_band=base_band,
+            n_witnesses=0, quorum=quorum, agreed_band=None, agree_count=0,
+            witnessed=False, agreed_score_lo=0.0, agreed_score_hi=0.0,
+            agreed_score_mean=0.0, witnesses=[], digest="sha256:",
+            n_opinions_submitted=n_opinions_submitted)
+        empty._walltime_s = round(time.time() - t0, 6)
+        return empty
+
+    # tally bands → modal band (over DISTINCT witnesses)
     bands = [w.band for w in witnesses]
     uniq, counts = np.unique(bands, return_counts=True)
     j = int(np.argmax(counts))
@@ -206,7 +267,8 @@ def witness_quorum(subject: str, base_score: float, evidence: np.ndarray,
         n_witnesses=n_witnesses, quorum=quorum,
         agreed_band=agreed_band, agree_count=agree_count, witnessed=witnessed,
         agreed_score_lo=lo, agreed_score_hi=hi, agreed_score_mean=mean,
-        witnesses=witnesses, digest=digest)
+        witnesses=witnesses, digest=digest,
+        n_opinions_submitted=n_opinions_submitted)
     receipt._walltime_s = round(time.time() - t0, 6)
     return receipt
 
