@@ -1,3 +1,5 @@
+> **SZL Holdings** · Doctrine v11 · Λ = Conjecture 1 (advisory, never "green"/theorem) · canonical [a-11-oy.com](https://a-11-oy.com)
+
 # szl_mosaic / khipu-sda-core — SZL-native clean-room anomaly-detection + SDA CORE
 
 **SZL Holdings · Dev 1 · Doctrine v11 · clean-room · sovereign · honest**
