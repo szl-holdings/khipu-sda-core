@@ -1,12 +1,12 @@
 # khipu-sda-core / szl_mosaic — clean-room anomaly/SDA core engine
 # Sovereign, own-metal, runnable in-sandbox. Pinned-by-major; permissive only.
 
-numpy>=1.24
-scipy>=1.10            # Hungarian assignment (track fusion); BSD-3
-scikit-learn>=1.3      # IsolationForest, StandardScaler; BSD-3
-matplotlib>=3.7        # validation figure; PSF/BSD-compatible
-sgp4>=2.20             # python-sgp4 (brandon-rhodes); MIT — orbit propagation
-torch>=2.0             # OPTIONAL tiny autoencoder; BSD-3-style. Falls back to a
+numpy>=2.5.1
+scipy>=1.18.0            # Hungarian assignment (track fusion); BSD-3
+scikit-learn>=1.9.0      # IsolationForest, StandardScaler; BSD-3
+matplotlib>=3.11.0        # validation figure; PSF/BSD-compatible
+sgp4>=2.27             # python-sgp4 (brandon-rhodes); MIT — orbit propagation
+torch>=2.13.0             # OPTIONAL tiny autoencoder; BSD-3-style. Falls back to a
                        # pure-numpy PCA autoencoder if torch is absent.
 
 # Shared receipt/attestation contract — the SINGLE SOURCE OF TRUTH for the
@@ -17,7 +17,7 @@ torch>=2.0             # OPTIONAL tiny autoencoder; BSD-3-style. Falls back to a
 szl-receipt @ git+https://github.com/szl-holdings/szl-receipt.git@v0.2.0
 
 # --- DEV/TEST ---
-pytest>=7.0
+pytest>=9.1.1
 
 # ============================================================================
 # CLEAN-ROOM LINEAGE (methods adopted, NOT vendored as runtime deps here):
