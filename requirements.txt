@@ -4,7 +4,7 @@
 numpy>=2.5.1
 scipy>=1.18.0            # Hungarian assignment (track fusion); BSD-3
 scikit-learn>=1.9.0      # IsolationForest, StandardScaler; BSD-3
-matplotlib>=3.11.0        # validation figure; PSF/BSD-compatible
+matplotlib>=3.11.1        # validation figure; PSF/BSD-compatible
 sgp4>=2.27             # python-sgp4 (brandon-rhodes); MIT — orbit propagation
 torch>=2.13.0             # OPTIONAL tiny autoencoder; BSD-3-style. Falls back to a
                        # pure-numpy PCA autoencoder if torch is absent.
