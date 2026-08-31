@@ -314,7 +314,7 @@ the locked count) · Khipu BFT = **Conjecture 2** (proposed, NOT proven — the
 consensus; a 'witnessed' verdict is a stronger ADVISORY only) · orbital screen =
 **SCREENING-GRADE roadmap**, honestly NOT operational \(P_c\)/covariance-grade ·
 SLSA **L1 honest /
-L2 build-attested / L3 roadmap** · **sovereign own-metal, 0 CDN** · **NO
+L2 roadmap (not yet earned — no signed build provenance in CI today) / L3 roadmap** · **sovereign own-metal, 0 CDN** · **NO
 free-energy** · joules MEASURED only · every $/credit = **ESTIMATE** ·
 **cite-never-plagiarize** · NEVER fabricate numbers (validation is real on
 synthetic data) · honest sensor caveat: broadcast Remote-ID/ADS-B/MAVLink are
