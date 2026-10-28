@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: Apache-2.0
+# Packaging metadata for the khipu-sda-core modules (PEP 517 / PEP 621).
+#
+# The repository is a flat layout of top-level szl_*.py modules, listed
+# explicitly below. Runtime dependencies stay in requirements.txt, which CI
+# installs. This file declares none and does not change how CI installs.
+# No tag or release exists, so the version is a placeholder.
+
+[build-system]
+# 77 is the first setuptools that accepts an SPDX string for project.license.
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "khipu-sda-core"
+version = "0.0.0"
+description = "Clean-room anomaly/SDA core engine (szl_mosaic)."
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES"]
+
+[tool.setuptools]
+py-modules = [
+    "szl_confidence",
+    "szl_mosaic_core",
+    "szl_mosaic_validate",
+    "szl_sda_envelope",
+    "szl_sda_orbit",
+    "szl_sda_spine",
+    "szl_track_fusion",
+    "szl_witness",
+]
