@@ -1,15 +1,23 @@
 """The packaging migration must keep the existing license admission control."""
 
+import importlib.util
 import json
 from pathlib import Path
 
 import pytest
 
-from tools.check_dependency_policy import forbidden_dependencies
+# This is a repository policy tool, not an installed runtime module. Load its
+# exact source file without depending on pytest's launch mode or changing sys.path.
+_POLICY = Path(__file__).resolve().parents[1] / "tools" / "check_dependency_policy.py"
+_SPEC = importlib.util.spec_from_file_location("sda_dependency_policy", _POLICY)
+assert _SPEC is not None and _SPEC.loader is not None
+_MODULE = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_MODULE)
+forbidden_dependencies = _MODULE.forbidden_dependencies
 
 
 @pytest.mark.parametrize("requirement", [
-    "alibi-detect", "alibi_detect>=1", "ALIBI.DETECT[extra]==1",
+    "alibi-detect", "alibi_detect>=1", "ALIBI.DETECT[extra]==1",  # Forbidden negative fixtures.
     "Alibi__Detect; python_version < '3.0'",
     "alibi-detect @ https://example.invalid/package.whl",
 ])
