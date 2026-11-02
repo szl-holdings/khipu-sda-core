@@ -2,8 +2,8 @@
 # Packaging metadata for the khipu-sda-core modules (PEP 517 / PEP 621).
 #
 # The repository is a flat layout of top-level szl_*.py modules, listed
-# explicitly below. Runtime dependencies stay in requirements.txt, which CI
-# installs. This file declares none and does not change how CI installs.
+# explicitly below. Wheel metadata owns the runtime dependency contract;
+# requirements.txt selects the optional features used by the repository CI.
 # No tag or release exists, so the version is a placeholder.
 
 [build-system]
@@ -18,6 +18,19 @@ description = "Clean-room anomaly/SDA core engine (szl_mosaic)."
 requires-python = ">=3.12"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES"]
+dependencies = [
+    "numpy>=2.5.4",
+    "scipy>=1.18.1",
+    "scikit-learn>=1.9.1",
+    "matplotlib>=3.11.2",
+    "sgp4>=2.27",
+]
+
+[project.optional-dependencies]
+# The base installation exercises the NumPy PCA and local unsigned-receipt paths.
+torch = ["torch>=2.14.1"]
+receipt = ["szl-receipt @ git+https://github.com/szl-holdings/szl-receipt.git@v0.2.0"]
+test = ["pytest>=9.1.1"]
 
 [tool.setuptools]
 py-modules = [

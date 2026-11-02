@@ -270,6 +270,30 @@ fused COP + score curves + **orbital conjunction screen** + **witness quorum**).
 
 ## Run
 
+A base installation (`python -m pip install .`, or the built wheel) resolves the
+NumPy, SciPy, scikit-learn, matplotlib and sgp4 dependencies. It includes every
+listed module and uses the NumPy PCA autoencoder and local unsigned receipt
+fallback. Torch and the shared receipt builder are opt-in extras: `.[torch]`
+and `.[receipt]`; `.[test]` adds pytest. `requirements.txt` selects all three
+extras for the full repository test environment. No package release is asserted.
+
+CI first builds a wheel and installs only that wheel in a new virtual environment.
+It checks dependencies, module origins and the base execution paths without the
+checkout on `sys.path`, then runs the existing full source suite separately.
+The license gate parses both base and optional project dependencies and normalizes
+package names; it retains the existing source-import scan.
+The same base check can be run as:
+
+```bash
+python -m pip wheel --no-deps --wheel-dir dist .
+python -m venv /tmp/sda-base
+/tmp/sda-base/bin/python -m pip install dist/*.whl
+/tmp/sda-base/bin/python -m pip check
+/tmp/sda-base/bin/python -I tools/check_installed_wheel.py
+```
+
+For the full optional-feature source environment:
+
 ```bash
 pip install -r requirements.txt
 python3 szl_mosaic_core.py        # smoke test the ensemble + receipt
