@@ -1,0 +1,2 @@
+include tools/check_installed_wheel.py
+include tools/check_dependency_policy.py

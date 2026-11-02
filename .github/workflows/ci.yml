@@ -9,10 +9,19 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with: { python-version: "3.12" }
+      - name: Build and check the base wheel in isolation
+        run: |
+          python -m pip wheel --no-deps --wheel-dir "$RUNNER_TEMP/sda-wheels" .
+          python -m venv "$RUNNER_TEMP/sda-base"
+          "$RUNNER_TEMP/sda-base/bin/python" -m pip install "$RUNNER_TEMP/sda-wheels/"*.whl
+          "$RUNNER_TEMP/sda-base/bin/python" -m pip check
+          "$RUNNER_TEMP/sda-base/bin/python" -I tools/check_installed_wheel.py
       - name: Install
         run: pip install -r requirements.txt pytest
       - name: Run tests
         run: pytest -q tests/
+      - name: Doctrine — canonical package dependency policy
+        run: python tools/check_dependency_policy.py
       - name: Doctrine — forbid BSL alibi-detect dependency (license hygiene)
         run: |
           # Fail ONLY on a real dependency/import of alibi-detect, NOT on the
