@@ -357,3 +357,5 @@ free-energy** · joules MEASURED only · every $/credit = **ESTIMATE** ·
 synthetic data) · honest sensor caveat: broadcast Remote-ID/ADS-B/MAVLink are
 **unauthenticated and spoofable** — every decoded field is a *claim*, and the same
 skepticism applies to fused anomaly inputs.
+
+Estate on Hugging Face: models, datasets and Spaces are published under the [SZLHOLDINGS](https://huggingface.co/SZLHOLDINGS) org.
