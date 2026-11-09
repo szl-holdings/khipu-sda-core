@@ -38,8 +38,10 @@ HONEST POSTURE & SCOPE LABEL (Doctrine v11):
 from __future__ import annotations
 
 import hashlib
+import math
 import time
 from dataclasses import dataclass, field
+from numbers import Real
 from typing import Callable, Optional
 
 import numpy as np
@@ -58,9 +60,23 @@ CONJECTURE_2_NOTE = (
 )
 
 
+def _unit_score(value: float, name: str) -> float:
+    """Require real, finite evidence on the documented [0, 1] score scale."""
+    if isinstance(value, bool) or not isinstance(value, Real):
+        raise ValueError(f"{name} must be a finite real number in [0, 1]")
+    if not 0 <= value <= 1 or not math.isfinite(value):
+        raise ValueError(f"{name} must be a finite real number in [0, 1]")
+    return float(value)
+
+
 def verdict_band(score: float, allow_thr: float = 0.35,
                  deny_thr: float = 0.65) -> str:
-    """Map a score to the Λ advisory band (same gate as the envelope)."""
+    """Map valid evidence to a Λ advisory band; reject invalid scores/rules."""
+    score = _unit_score(score, "score")
+    allow_thr = _unit_score(allow_thr, "allow_thr")
+    deny_thr = _unit_score(deny_thr, "deny_thr")
+    if allow_thr >= deny_thr:
+        raise ValueError("thresholds must satisfy allow_thr < deny_thr")
     if score < allow_thr:
         return "allow"
     if score < deny_thr:
@@ -207,9 +223,14 @@ def witness_quorum(subject: str, base_score: float, evidence: np.ndarray,
 
     Returns a QuorumReceipt with REAL per-witness scores. Khipu BFT = Conjecture 2
     (proposed, not proven) — a witnessed verdict is a stronger ADVISORY only.
+
+    Invalid base/retained witness scores or thresholds raise ValueError before a
+    receipt is emitted. External witness bands must agree with their scores
+    under this call's thresholds. First-seen duplicate handling is unchanged.
     """
     t0 = time.time()
     rescorer = rescorer or default_rescorer
+    base_score = _unit_score(base_score, "base_score")
     base_band = verdict_band(base_score, allow_thr, deny_thr)
 
     n_opinions_submitted: Optional[int] = None
@@ -223,11 +244,15 @@ def witness_quorum(subject: str, base_score: float, evidence: np.ndarray,
         n_opinions_submitted = len(submitted)
         witnesses = dedup_witness_opinions(submitted)
         n_witnesses = len(witnesses)
+        for witness in witnesses:
+            expected_band = verdict_band(witness.score, allow_thr, deny_thr)
+            if witness.band != expected_band:
+                raise ValueError("external witness band does not match its score")
     else:
         witnesses = []
         for w in range(n_witnesses):
             seed = base_seed + w
-            sc = rescorer(evidence, seed, base_score)
+            sc = _unit_score(rescorer(evidence, seed, base_score), "witness score")
             band = verdict_band(sc, allow_thr, deny_thr)
             witnesses.append(WitnessOpinion(witness_id=f"witness-{w}", seed=seed,
                                             score=sc, band=band))
@@ -281,7 +306,7 @@ def witness_envelope(envelope: dict, evidence: Optional[np.ndarray] = None,
     (or the score itself) as the evidence vector. Adds a `_witness` block. Λ stays
     advisory; this NEVER flips _signing.status to a false "verified/green".
     """
-    base_score = float(envelope.get("anomaly_score", 0.0))
+    base_score = _unit_score(envelope.get("anomaly_score", 0.0), "base_score")
     if evidence is None:
         comps = envelope.get("component_scores") or {}
         evidence = (np.array(list(comps.values()), dtype=float)

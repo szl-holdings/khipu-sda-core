@@ -21,7 +21,9 @@ from szl_witness import (WitnessOpinion, witness_quorum, dedup_witness_opinions,
 EV = np.array([0.8, 0.82, 0.79])
 
 
-def _op(wid, band, score=0.8, seed=0):
+def _op(wid, band, score=None, seed=0):
+    if score is None:
+        score = {"allow": 0.2, "advisory": 0.5, "deny": 0.8}[band]
     return WitnessOpinion(witness_id=wid, seed=seed, score=score, band=band)
 
 
