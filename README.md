@@ -168,6 +168,12 @@ detection is **witnessed** iff \(c\ge Q\) with the Khipu quorum \(Q\text{-of-}M=
 (super-majority, tolerates one dissenting/faulty witness). The quorum receipt
 records which witnesses agreed and the agreed score band \([\min_w s_w,\max_w s_w]\).
 
+Base and retained witness scores must be finite real numbers in `[0, 1]`.
+Thresholds must satisfy `0 <= allow_thr < deny_thr <= 1`; an external opinion's
+band must match its score under those thresholds. Invalid input raises
+`ValueError` before a receipt is emitted. Duplicate witness IDs still use the
+first opinion, and valid receipts remain advisory and unsigned.
+
 > **HONEST LIMIT — Khipu BFT = Conjecture 2 (PROPOSED, NOT PROVEN).** This is the
 > **engineering mechanism** (an \(N\)-of-\(M\) agreement gate), **not a proven-safe
 > consensus**: no Byzantine safety/liveness proof, no partial-synchrony bound, no
