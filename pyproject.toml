@@ -15,6 +15,7 @@ build-backend = "setuptools.build_meta"
 name = "khipu-sda-core"
 version = "0.1.0"
 description = "Clean-room anomaly/SDA core engine (szl_mosaic)."
+readme = "README.md"
 requires-python = ">=3.12"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES"]
