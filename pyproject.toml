@@ -4,7 +4,7 @@
 # The repository is a flat layout of top-level szl_*.py modules, listed
 # explicitly below. Wheel metadata owns the runtime dependency contract;
 # requirements.txt selects the optional features used by the repository CI.
-# No tag or release exists, so the version is a placeholder.
+# Version 0.1.0: first release candidate on the canonical PyPI path (szl.pypi-release.v2).
 
 [build-system]
 # 77 is the first setuptools that accepts an SPDX string for project.license.
@@ -13,7 +13,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "khipu-sda-core"
-version = "0.0.0"
+version = "0.1.0"
 description = "Clean-room anomaly/SDA core engine (szl_mosaic)."
 requires-python = ">=3.12"
 license = "Apache-2.0"
