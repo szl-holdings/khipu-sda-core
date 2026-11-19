@@ -1,0 +1,28 @@
+# PyPI publish workflow (trusted publishing / OIDC).
+# PREREQUISITE (owner-gated): register this GitHub repo + workflow as a Trusted
+# Publisher for the corresponding PyPI project at https://pypi.org/manage/account/publishing/
+# until then this workflow fails closed (it will NOT publish without an accepted OIDC claim).
+name: Publish to PyPI
+on:
+  release:
+    types: [published]
+  workflow_dispatch: {}
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build sdist and wheel
+        run: |
+          pip install --upgrade build
+          python -m build
+      - name: Publish to PyPI (trusted publishing, no tokens)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verify-metadata: true
