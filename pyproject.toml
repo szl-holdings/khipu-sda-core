@@ -31,7 +31,7 @@ dependencies = [
 [project.optional-dependencies]
 # The base installation exercises the NumPy PCA and local unsigned-receipt paths.
 torch = ["torch>=2.14.1"]
-receipt = ["szl-receipt-dsse>=0.2.0"]
+receipt = ["szl-receipt-dsse==0.2.0"]
 test = ["pytest>=9.1.1"]
 
 [tool.setuptools]
