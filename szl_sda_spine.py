@@ -87,8 +87,7 @@ def _require_szl_receipt():
     except Exception as exc:  # pragma: no cover - exercised only without the lib
         raise SpineUnavailable(
             "szl_receipt (v0.2.0) is not installed; install "
-            "`szl-receipt @ git+https://github.com/szl-holdings/szl-receipt.git"
-            "@v0.2.0` (already pinned in requirements.txt) to fold SDA/witness "
+            "`szl-receipt-dsse==0.2.0` (the tested PyPI release) to fold SDA/witness "
             "decisions onto the canonical szl-receipt spine. Refusing to "
             "duplicate the shared receipt shapes."
         ) from exc
