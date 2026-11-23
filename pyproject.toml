@@ -13,7 +13,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "khipu-sda-core"
-version = "0.1.0"
+version = "0.1.1"
 description = "Clean-room anomaly/SDA core engine (szl_mosaic)."
 readme = "README.md"
 urls = { Source = "https://github.com/szl-holdings/khipu-sda-core", Repository = "https://github.com/szl-holdings/khipu-sda-core", Homepage = "https://a-11-oy.com" }
@@ -31,7 +31,7 @@ dependencies = [
 [project.optional-dependencies]
 # The base installation exercises the NumPy PCA and local unsigned-receipt paths.
 torch = ["torch>=2.14.1"]
-receipt = ["szl-receipt @ git+https://github.com/szl-holdings/szl-receipt.git@v0.2.0"]
+receipt = ["szl-receipt-dsse==0.3.4"]
 test = ["pytest>=9.1.1"]
 
 [tool.setuptools]
